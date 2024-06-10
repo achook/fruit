@@ -5,7 +5,7 @@ import numpy as np
 OUTPUT_DIR = "output"
 
 # Choose the video files to process, must be an array
-VIDEO_PATHS = ["input/video_3.mp4"]
+VIDEO_PATHS = ["input/video_1.mp4", "input/video_2.mp4", "input/video_3.mp4", "input/video_4.mp4"]
 
 # Set PREVIEW to True to display the detected apples in a window
 PREVIEW = True
