@@ -5,10 +5,10 @@ import numpy as np
 OUTPUT_DIR = "output"
 
 # Choose the video files to process, must be an array
-VIDEO_PATHS = ["input/video_1.mp4", "input/video_2.mp4", "input/video_3.mp4", "input/video_4.mp4"]
+VIDEO_PATHS = ["input/video_3.mp4"]
 
 # Set PREVIEW to True to display the detected apples in a window
-PREVIEW = False
+PREVIEW = True
 
 # Set SKIP_FRAMES to 1 to process every frame or higher to read every nth frame
 SKIP_FRAMES = 1
@@ -33,7 +33,7 @@ for video_idx, video_path in enumerate(VIDEO_PATHS):
 
             # Define the range of yellow and red color in HSV
             # TODO: Adjust the lower and upper values to detect the apples
-            lower_yellow = np.array([19, 120, 110])
+            lower_yellow = np.array([19, 99, 110])
             upper_yellow = np.array([29, 200, 255])
 
             lower_red1 = np.array([170, 100, 86])
