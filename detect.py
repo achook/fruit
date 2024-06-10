@@ -37,37 +37,52 @@ while cap.isOpened():
         contours_all, _ = cv2.findContours(mask_all, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         contours_yellow, _ = cv2.findContours(mask_yellow, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         contours_red, _ = cv2.findContours(mask_red, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        
+        MIN_WIDTH = 4
+        MIN_HEIGHT = 4
+        padding = 7
+
+        def check_image_dimension(w, h):
+            # aspect_ratio = w / float(h)
+            # return 0.5 <= aspect_ratio <= 1.5 and w > MIN_WIDTH and h > MIN_HEIGHT
+            return w > MIN_WIDTH and h > MIN_HEIGHT
 
         # Loop over the contours
         for i, contour in enumerate(contours_yellow):
             # Get the bounding box for each contour
-            # TODO: Add some pixel padding to the bounding box
-            # TODO: Check if the aspect ratio of the bounding box is close to 1
             x, y, w, h = cv2.boundingRect(contour)
+            if check_image_dimension(w, h):
+                x_padded = max(0, x - padding)
+                y_padded = max(0, y - padding)
+                w_padded = min(frame.shape[1], x + w + padding) - x_padded
+                h_padded = min(frame.shape[0], y + h + padding) - y_padded
 
-            # Crop the apple from the original image
-            yellow_apple = frame[y:y + h, x:x + w]
+                # Crop the apple from the original image
+                yellow_apple = frame[y_padded:y_padded + h_padded, x_padded:x_padded + w_padded]
 
-            # Save the cropped apple image
-            cv2.imwrite(f'{OUTPUT_DIR}/yellow/unlabeled/apple_{i}.jpeg', yellow_apple)
+                # Save the cropped apple image
+                cv2.imwrite(f'{OUTPUT_DIR}/yellow/unlabeled/apple_{i}.jpeg', yellow_apple)
 
-            # Draw the bounding box on the original image
-            cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
+                # Draw the bounding box on the original image
+                cv2.rectangle(frame, (x_padded, y_padded), (x_padded + w_padded, y_padded + h_padded), (0, 255, 0), 2)
 
         for i, contour in enumerate(contours_red):
             # Get the bounding box for each contour
-            # TODO: Add some pixel padding to the bounding box
-            # TODO: Check if the aspect ratio of the bounding box is close to 1
             x, y, w, h = cv2.boundingRect(contour)
 
             # Crop the apple from the original image
             red_apple = frame[y:y + h, x:x + w]
+            
+            if check_image_dimension(w, h):
+                x_padded = max(0, x - padding)
+                y_padded = max(0, y - padding)
+                w_padded = min(frame.shape[1], x + w + padding) - x_padded
+                h_padded = min(frame.shape[0], y + h + padding) - y_padded
 
-            # Save the cropped apple image
-            cv2.imwrite(f'{OUTPUT_DIR}/red/unlabeled/apple_{i}.jpeg', red_apple)
+                red_apple = frame[y_padded:y_padded + h_padded, x_padded:x_padded + w_padded]
+                cv2.imwrite(f'{OUTPUT_DIR}/red/unlabeled/apple_{i}.jpeg', red_apple)
+                cv2.rectangle(frame, (x_padded, y_padded), (x_padded + w_padded, y_padded + h_padded), (0, 255, 0), 2)
 
-            # Draw the bounding box on the original image
-            cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
 
         cv2.imshow('Detected Apples', frame)
