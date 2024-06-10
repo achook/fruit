@@ -1,4 +1,3 @@
-import tensorflow as ts
 from keras import models, layers, optimizers
 from keras.src.utils import image_dataset_from_directory
 import os
