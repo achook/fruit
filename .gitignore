@@ -407,8 +407,11 @@ $RECYCLE.BIN/
 
 # End of https://www.toptal.com/developers/gitignore/api/python,jupyternotebooks,macos,windows,linux,git,pycharm,visualstudiocode
 
-# Ignore red apple images
-output/apple_red_*.jpeg
+# Ignore all apple images
+output/**/apple_*.jpeg
 
-# Ignore yellow apple images
-output/apple_yellow_*.jpeg
+# Ignore input videos
+input/video*.mp4
+
+# Trained models
+*.keras

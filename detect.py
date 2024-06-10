@@ -49,7 +49,7 @@ while cap.isOpened():
             yellow_apple = frame[y:y + h, x:x + w]
 
             # Save the cropped apple image
-            cv2.imwrite(f'{OUTPUT_DIR}/yellow/apple_{i}.jpeg', yellow_apple)
+            cv2.imwrite(f'{OUTPUT_DIR}/yellow/unlabeled/apple_{i}.jpeg', yellow_apple)
 
             # Draw the bounding box on the original image
             cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
@@ -64,7 +64,7 @@ while cap.isOpened():
             red_apple = frame[y:y + h, x:x + w]
 
             # Save the cropped apple image
-            cv2.imwrite(f'{OUTPUT_DIR}/red/apple_{i}.jpeg', red_apple)
+            cv2.imwrite(f'{OUTPUT_DIR}/red/unlabeled/apple_{i}.jpeg', red_apple)
 
             # Draw the bounding box on the original image
             cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
