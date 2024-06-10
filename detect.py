@@ -5,10 +5,10 @@ import numpy as np
 OUTPUT_DIR = "output"
 
 # Choose the video files to process, must be an array
-VIDEO_PATHS = ["input/video_1.mp4", "input/video_2.mp4", "input/video_3.mp4", "input/video_4.mp4"]
+VIDEO_PATHS = ["input/video_3.mp4"]
 
 # Set PREVIEW to True to display the detected apples in a window
-PREVIEW = False
+PREVIEW = True
 
 # Set SKIP_FRAMES to 1 to process every frame or higher to read every nth frame
 SKIP_FRAMES = 1
@@ -33,25 +33,25 @@ for video_idx, video_path in enumerate(VIDEO_PATHS):
 
             # Define the range of yellow and red color in HSV
             # TODO: Adjust the lower and upper values to detect the apples
-            lower_yellow = np.array([20, 100, 100])
-            upper_yellow = np.array([30, 255, 255])
+            lower_yellow = np.array([19, 120, 110])
+            upper_yellow = np.array([29, 200, 255])
 
-            lower_red1 = np.array([0, 100, 100])
-            upper_red1 = np.array([10, 255, 255])
-            lower_red2 = np.array([160, 100, 100])
-            upper_red2 = np.array([180, 255, 255])
+            lower_red1 = np.array([170, 100, 86])
+            upper_red1 = np.array([180, 245, 244])
+            # lower_red2 = np.array([160, 100, 100])
+            # upper_red2 = np.array([180, 255, 255])
 
             # Create a mask that isolates the yellow regions
             mask_yellow = cv2.inRange(hsv, lower_yellow, upper_yellow)
             mask_red1 = cv2.inRange(hsv, lower_red1, upper_red1)
-            mask_red2 = cv2.inRange(hsv, lower_red2, upper_red2)
-            mask_red = cv2.bitwise_or(mask_red1, mask_red2)
-            mask_all = cv2.bitwise_or(mask_yellow, mask_red)
+            # mask_red2 = cv2.inRange(hsv, lower_red2, upper_red2)
+            # mask_red = cv2.bitwise_or(mask_red1, mask_red2)
+            mask_all = cv2.bitwise_or(mask_yellow, mask_red1)
 
             # Find contours in the mask
             contours_all, _ = cv2.findContours(mask_all, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
             contours_yellow, _ = cv2.findContours(mask_yellow, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-            contours_red, _ = cv2.findContours(mask_red, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+            contours_red, _ = cv2.findContours(mask_red1, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
             MIN_WIDTH = 4
             MIN_HEIGHT = 4
@@ -62,6 +62,9 @@ for video_idx, video_path in enumerate(VIDEO_PATHS):
                 # aspect_ratio = w / float(h)
                 # return 0.5 <= aspect_ratio <= 1.5 and w > MIN_WIDTH and h > MIN_HEIGHT
                 return w > MIN_WIDTH and h > MIN_HEIGHT
+            
+            bounding_boxes_yellow = []
+            bounding_boxes_red = []
 
 
             # Loop over the contours
@@ -80,9 +83,7 @@ for video_idx, video_path in enumerate(VIDEO_PATHS):
                     # Save the cropped apple image
                     cv2.imwrite(f'{OUTPUT_DIR}/yellow/unlabeled/apple_{video_idx+1}_{i}.jpeg', yellow_apple)
 
-                    # Draw the bounding box on the original image
-                    cv2.rectangle(frame, (x_padded, y_padded), (x_padded + w_padded, y_padded + h_padded), (0, 255, 0),
-                                  2)
+                    bounding_boxes_yellow.append((x_padded, y_padded, w_padded, h_padded)) 
 
             for i, contour in enumerate(contours_red):
                 # Get the bounding box for each contour
@@ -99,8 +100,14 @@ for video_idx, video_path in enumerate(VIDEO_PATHS):
 
                     red_apple = frame[y_padded:y_padded + h_padded, x_padded:x_padded + w_padded]
                     cv2.imwrite(f'{OUTPUT_DIR}/red/unlabeled/apple_{video_idx+1}_{i}.jpeg', red_apple)
-                    cv2.rectangle(frame, (x_padded, y_padded), (x_padded + w_padded, y_padded + h_padded), (0, 255, 0),
-                                  2)
+                    bounding_boxes_red.append((x_padded, y_padded, w_padded, h_padded))
+                    
+            # Draw the bounding boxes
+            for x, y, w, h in bounding_boxes_yellow:
+                cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 255), 2)
+                
+            for x, y, w, h in bounding_boxes_red:
+                cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 0, 0), 2)
 
             if PREVIEW:
                 cv2.imshow('Detected apples', frame)
