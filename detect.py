@@ -1,16 +1,29 @@
 import cv2
 import numpy as np
 
+# Choose the output directory to save the detected apples
 OUTPUT_DIR = "output"
+
+# Choose the video files to process, must be an array
 VIDEO_PATHS = ["input/video_1.mp4", "input/video_2.mp4", "input/video_3.mp4", "input/video_4.mp4"]
+
+# Set PREVIEW to True to display the detected apples in a window
 PREVIEW = False
+
+# Set SKIP_FRAMES to 1 to process every frame or higher to read every nth frame
+SKIP_FRAMES = 1
 
 for video_idx, video_path in enumerate(VIDEO_PATHS):
     # Open video file
     cap = cv2.VideoCapture(video_path)
 
+    # Read every SKIP_FRAMES frames
     # Read until video is completed
     while cap.isOpened():
+        for _ in range(SKIP_FRAMES - 1):
+            cap.read()
+            print("a")
+
         # Capture frame-by-frame
         ret, frame = cap.read()
 
