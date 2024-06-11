@@ -13,6 +13,33 @@ PREVIEW = True
 # Set SKIP_FRAMES to 1 to process every frame or higher to read every nth frame
 SKIP_FRAMES = 1
 
+def merge_overlapping_boxes(boxes):
+    if not boxes:
+        return []
+
+    merged_boxes = []
+    boxes = sorted(boxes, key=lambda b: b[0])
+
+    while boxes:
+        a = boxes.pop(0)
+        merged = False
+        for i in range(len(merged_boxes)):
+            b = merged_boxes[i]
+            if (a[0] <= b[0] + b[2] and a[0] + a[2] >= b[0] and
+                a[1] <= b[1] + b[3] and a[1] + a[3] >= b[1]):
+                # Merge boxes
+                new_x = min(a[0], b[0])
+                new_y = min(a[1], b[1])
+                new_w = max(a[0] + a[2], b[0] + b[2]) - new_x
+                new_h = max(a[1] + a[3], b[1] + b[3]) - new_y
+                merged_boxes[i] = (new_x, new_y, new_w, new_h)
+                merged = True
+                break
+        if not merged:
+            merged_boxes.append(a)
+    
+    return merged_boxes
+
 for video_idx, video_path in enumerate(VIDEO_PATHS):
     # Open video file
     cap = cv2.VideoCapture(video_path)
@@ -101,6 +128,9 @@ for video_idx, video_path in enumerate(VIDEO_PATHS):
                     red_apple = frame[y_padded:y_padded + h_padded, x_padded:x_padded + w_padded]
                     cv2.imwrite(f'{OUTPUT_DIR}/red/unlabeled/apple_{video_idx+1}_{i}.jpeg', red_apple)
                     bounding_boxes_red.append((x_padded, y_padded, w_padded, h_padded))
+
+            bounding_boxes_yellow = merge_overlapping_boxes(bounding_boxes_yellow)
+            bounding_boxes_red = merge_overlapping_boxes(bounding_boxes_red)
                     
             # Draw the bounding boxes
             for x, y, w, h in bounding_boxes_yellow:
@@ -117,3 +147,6 @@ for video_idx, video_path in enumerate(VIDEO_PATHS):
                     break
         else:
             break
+
+    cap.release()
+cv2.destroyAllWindows()    
