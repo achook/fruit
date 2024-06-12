@@ -17,6 +17,8 @@ YELLOW_APPLE_DETECT_MIN_CONFIDENCE = 0.5
 
 NETWORK_INPUT_SHAPE = (50, 50, 3)
 
+SHOW_UNSURE = False
+
 # Load the models
 model_red = models.load_model("models/red_apple_model.keras")
 model_yellow = models.load_model("models/yellow_apple_model.keras")
@@ -50,6 +52,7 @@ while cap.isOpened():
         contours_red, _ = cv2.findContours(mask_red, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
         bounding_boxes_yellow, bounding_boxes_red = [], []
+        bounding_boxes_yellow_unsure, bounding_boxes_red_unsure = [], []
 
         # Loop over the contours
         for i, contour in enumerate(contours_yellow):
@@ -81,6 +84,8 @@ while cap.isOpened():
                 prediction = model_yellow.predict(yellow_apple, verbose=0)
                 if prediction > YELLOW_APPLE_DETECT_MIN_CONFIDENCE:
                     bounding_boxes_yellow.append((x_padded, y_padded, w_padded, h_padded))
+                else:
+                    bounding_boxes_yellow_unsure.append((x_padded, y_padded, w_padded, h_padded))
 
         for i, contour in enumerate(contours_red):
             # Get the bounding box for each contour
@@ -109,7 +114,11 @@ while cap.isOpened():
                 prediction = model_red.predict(red_apple, verbose=0)
                 if prediction[0][0] > RED_APPLE_DETECT_MIN_CONFIDENCE:
                     bounding_boxes_red.append((x_padded, y_padded, w_padded, h_padded))
+                else:
+                    bounding_boxes_red_unsure.append((x_padded, y_padded, w_padded, h_padded))
 
+        bounding_boxes_yellow_unsure = merge_overlapping_boxes(bounding_boxes_yellow_unsure)
+        bounding_boxes_red_unsure = merge_overlapping_boxes(bounding_boxes_red_unsure)
         bounding_boxes_yellow = merge_overlapping_boxes(bounding_boxes_yellow)
         bounding_boxes_red = merge_overlapping_boxes(bounding_boxes_red)
 
@@ -119,6 +128,13 @@ while cap.isOpened():
 
         for x, y, w, h in bounding_boxes_red:
             cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 255), 2)
+
+        if SHOW_UNSURE:
+            for x, y, w, h in bounding_boxes_yellow_unsure:
+                cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 128), 2)
+
+            for x, y, w, h in bounding_boxes_red_unsure:
+                cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 128), 2)
 
         cv2.imshow('Detected apples', frame)
 
