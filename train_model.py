@@ -3,7 +3,7 @@ from keras.src.utils import image_dataset_from_directory
 from matplotlib import pyplot as plt
 import os
 
-INPUT_IMAGE_SHAPE = (50, 50, 3)
+INPUT_IMAGE_SHAPE = (50, 50, 1)
 INPUT_DIR_YELLOWS = "output/yellow"
 INPUT_DIR_REDS = "output/red"
 SEED = 42
@@ -50,6 +50,7 @@ train_dataset_yellow, val_dataset_yellow = image_dataset_from_directory(INPUT_DI
                                                                         image_size=(INPUT_IMAGE_SHAPE[0], INPUT_IMAGE_SHAPE[1]),
                                                                         batch_size=32,
                                                                         pad_to_aspect_ratio=True,
+                                                                        color_mode="grayscale",
                                                                         seed=SEED)
 
 train_dataset_red, val_dataset_red = image_dataset_from_directory(INPUT_DIR_REDS,
@@ -61,6 +62,7 @@ train_dataset_red, val_dataset_red = image_dataset_from_directory(INPUT_DIR_REDS
                                                                   image_size=(INPUT_IMAGE_SHAPE[0], INPUT_IMAGE_SHAPE[1]),
                                                                   batch_size=32,
                                                                   pad_to_aspect_ratio=True,
+                                                                  color_mode="grayscale",
                                                                   seed=SEED)
 
 history_yellow = model_yellow.fit(train_dataset_yellow, validation_data=val_dataset_yellow, epochs=30, verbose=1)

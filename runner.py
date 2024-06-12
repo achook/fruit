@@ -15,9 +15,9 @@ APPLE_PADDING = 7
 RED_APPLE_DETECT_MIN_CONFIDENCE = 0.5
 YELLOW_APPLE_DETECT_MIN_CONFIDENCE = 0.5
 
-NETWORK_INPUT_SHAPE = (50, 50, 3)
+NETWORK_INPUT_SHAPE = (50, 50, 1)
 
-SHOW_UNSURE = False
+SHOW_UNSURE = True
 
 # Load the models
 model_red = models.load_model("models/red_apple_model.keras")
@@ -36,7 +36,7 @@ while cap.isOpened():
         # Display the resulting frame
         hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
-        lower_yellow = np.array([19, 99, 110])
+        lower_yellow = np.array([19, 80, 110])
         upper_yellow = np.array([29, 200, 255])
         lower_red = np.array([170, 100, 86])
         upper_red = np.array([180, 245, 244])
@@ -77,8 +77,10 @@ while cap.isOpened():
                     yellow_apple = cv2.copyMakeBorder(yellow_apple, 0, 0, pad, pad, cv2.BORDER_CONSTANT,
                                                       value=(0, 0, 0))
 
+                yellow_apple = cv2.cvtColor(yellow_apple, cv2.COLOR_BGR2GRAY)
                 yellow_apple = cv2.resize(yellow_apple, NETWORK_INPUT_SHAPE[:2])
                 yellow_apple = np.expand_dims(yellow_apple, axis=0)
+
 
                 # Predict the apple
                 prediction = model_yellow.predict(yellow_apple, verbose=0)
@@ -107,6 +109,7 @@ while cap.isOpened():
                     pad = (h_padded - w_padded) // 2
                     red_apple = cv2.copyMakeBorder(red_apple, 0, 0, pad, pad, cv2.BORDER_CONSTANT, value=(0, 0, 0))
 
+                red_apple = cv2.cvtColor(red_apple, cv2.COLOR_BGR2GRAY)
                 red_apple = cv2.resize(red_apple, (50, 50))
                 red_apple = np.expand_dims(red_apple, axis=0)
 
