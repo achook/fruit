@@ -15,9 +15,9 @@ os.environ["KERAS_BACKEND"] = "tensorflow"
 # Define the model
 model_red = models.Sequential()
 model_red.add(layers.BatchNormalization(input_shape=INPUT_IMAGE_SHAPE))
+# model_red.add(layers.Conv2D(64, (3, 3), activation="relu", padding="SAME", kernel_initializer="he_normal"))
+# model_red.add(layers.MaxPooling2D((2, 2)))
 model_red.add(layers.Conv2D(32, (3, 3), activation="relu", padding="SAME", kernel_initializer="he_normal"))
-model_red.add(layers.MaxPooling2D((2, 2)))
-model_red.add(layers.Conv2D(64, (3, 3), activation="relu", padding="SAME", kernel_initializer="he_normal"))
 model_red.add(layers.MaxPooling2D((2, 2)))
 model_red.add(layers.Flatten())
 model_red.add(layers.Dense(64, activation="relu"))
@@ -29,9 +29,9 @@ model_red.compile(loss="binary_crossentropy", optimizer=optimizers.RMSprop(learn
 
 model_yellow = models.Sequential()
 model_yellow.add(layers.BatchNormalization(input_shape=INPUT_IMAGE_SHAPE))
-model_yellow.add(layers.Conv2D(32, (3, 3), activation="relu", padding="SAME", kernel_initializer="he_normal"))
-model_yellow.add(layers.MaxPooling2D((2, 2)))
 model_yellow.add(layers.Conv2D(64, (3, 3), activation="relu", padding="SAME", kernel_initializer="he_normal"))
+model_yellow.add(layers.MaxPooling2D((2, 2)))
+model_yellow.add(layers.Conv2D(32, (3, 3), activation="relu", padding="SAME", kernel_initializer="he_normal"))
 model_yellow.add(layers.MaxPooling2D((2, 2)))
 model_yellow.add(layers.Flatten())
 model_yellow.add(layers.Dense(64, activation="relu"))
@@ -65,8 +65,8 @@ train_dataset_red, val_dataset_red = image_dataset_from_directory(INPUT_DIR_REDS
                                                                   color_mode="grayscale",
                                                                   seed=SEED)
 
-history_yellow = model_yellow.fit(train_dataset_yellow, validation_data=val_dataset_yellow, epochs=30, verbose=1)
-history_red = model_red.fit(train_dataset_red, validation_data=val_dataset_red, epochs=30, verbose=1)
+history_yellow = model_yellow.fit(train_dataset_yellow, validation_data=val_dataset_yellow, epochs=15, verbose=1)
+history_red = model_red.fit(train_dataset_red, validation_data=val_dataset_red, epochs=10, verbose=1)
 
 # Save the model
 model_yellow.save("models/yellow_apple_model.keras")
@@ -81,10 +81,30 @@ plt.ylabel("Accuracy")
 plt.legend()
 plt.show()
 
+
 plt.plot(history_red.history["acc"], label="Training accuracy")
 plt.plot(history_red.history["val_acc"], label="Validation accuracy")
 plt.title("Red apple model")
 plt.xlabel("Epoch")
 plt.ylabel("Accuracy")
+plt.legend()
+plt.show()
+
+
+# Plot loss
+plt.plot(history_yellow.history["loss"], label="Training loss") 
+plt.plot(history_yellow.history["val_loss"], label="Validation loss")
+plt.title("Yellow apple model")
+plt.xlabel("Epoch")
+plt.ylabel("Loss")
+plt.legend()
+plt.show()
+
+
+plt.plot(history_red.history["loss"], label="Training loss")
+plt.plot(history_red.history["val_loss"], label="Validation loss")
+plt.title("Red apple model")
+plt.xlabel("Epoch")
+plt.ylabel("Loss")
 plt.legend()
 plt.show()

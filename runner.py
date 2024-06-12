@@ -12,7 +12,7 @@ APPLE_PADDING = 7
 
 # The minimum confidence to consider an apple detected (0.0 - 1.0)
 # The higher the value, the more confident the network has to be for the image to be considered as an apple
-RED_APPLE_DETECT_MIN_CONFIDENCE = 0.5
+RED_APPLE_DETECT_MIN_CONFIDENCE = 0.9
 YELLOW_APPLE_DETECT_MIN_CONFIDENCE = 0.5
 
 NETWORK_INPUT_SHAPE = (50, 50, 1)
